@@ -98,7 +98,9 @@ class MyWebSocket extends WebSocket {
   }
   //在客户端发送消息之后，延时等待服务器响应,通过webSocketState判断是否连线成功
   waitingServer () {
+    this.webSocketState = false
     setTimeout(() => {
+      // 连线成功状态下 继续心跳检测
       if(this.webSocketState) {
         this.startHeartBeat(this.heartBeatConfig.time)
         return
@@ -110,8 +112,8 @@ class MyWebSocket extends WebSocket {
       } catch (error) {
         console.log('当前连接已经关闭')
       }
-      // 重新连接
-      this.reconnectWebSocket()
+      // // 重新连接
+      // this.reconnectWebSocket()
     }, this.heartBeatConfig.timeout)
   }
 
