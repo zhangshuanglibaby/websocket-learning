@@ -1,0 +1,60 @@
+<!--
+ * @Date: 2022-12-11 15:11:36
+ * @LastEditors: zhangshuangli
+ * @LastEditTime: 2022-12-11 15:48:21
+ * @Description: 这是****文件
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+</html>
+<script>
+  // 创建webscoket 对象 地址填入本地ip 端口是在搭建websocket服务器定义的端口
+  const ws = new WebSocket('ws://127.0.0.1:8000')
+  // 执行上面的语句之后，客户端就会与服务器进行连接
+
+  // readyState返回当前实例对象的当前状态
+  /*
+    共有四种状态
+    CONNECTING: 值为0，表示正在连接
+    OPEN:  值为1，表示连接成功，可以通信了
+    CLOSING 值为2， 表示连接正在关闭
+    CLOSED 值为3，表示连接已经关闭了，或者打开连接失败
+  */
+
+  // 实例对象的onopen属性，用于指定连接成功后的回调函数
+  ws.onopen = (res) => {
+    console.log('onopen readyState',ws.readyState)
+    console.log('onopen 连接成功==========>', res)
+  }
+
+  // 实例对象的onmessage属性，用于指定收到服务器数据后的回调函数
+  ws.onmessage = ({ data }) => {
+    console.log('onmessage readyState',ws.readyState)
+    // 注意此时的data是json格式的 需要转化下
+    console.log('onmessage 有新消息啦=======>', JSON.parse(data))
+  }
+
+  // 实例对象的onclose属性，用于连接关闭后的回调 函数
+  // 当关闭了服务器后 会走到此回调函数
+  ws.onclose = () => {
+    console.log('onclose readyState',ws.readyState)
+    console.log('onclose websocket连接关闭=======>')
+  }
+
+  // 连接发生错误的回调方法
+  // 如当服务器没有启动 就会走到这个错误回调
+  ws.onerror = (error) => {
+    console.log('onerror readyState',ws.readyState)
+    console.log('onerror 发生错误==========>', error)
+  }
+
+</script>
