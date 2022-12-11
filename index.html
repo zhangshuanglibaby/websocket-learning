@@ -1,7 +1,7 @@
 <!--
  * @Date: 2022-12-11 15:11:36
  * @LastEditors: zhangshuangli
- * @LastEditTime: 2022-12-11 15:48:21
+ * @LastEditTime: 2022-12-11 16:47:14
  * @Description: 这是****文件
 -->
 <!DOCTYPE html>
@@ -41,6 +41,8 @@
     console.log('onmessage readyState',ws.readyState)
     // 注意此时的data是json格式的 需要转化下
     console.log('onmessage 有新消息啦=======>', JSON.parse(data))
+    // 实例对象的send方法给服务器发送消息
+    ws.send('客户端发送消息')
   }
 
   // 实例对象的onclose属性，用于连接关闭后的回调 函数

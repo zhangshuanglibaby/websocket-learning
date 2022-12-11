@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-12-11 14:39:02
  * @LastEditors: zhangshuangli
- * @LastEditTime: 2022-12-11 15:33:16
+ * @LastEditTime: 2022-12-11 16:44:48
  * @Description: 这是****文件
  */
 /* 服务器 */
@@ -40,8 +40,22 @@ wsServer.on('request', (request) => {
       title: '标题' + time++,
       value: '内容' + time++
     }
+    // 向客户端发送消息
     connection.send(JSON.stringify(obj))
   }, 2000)
+
+  // 监听客户端发来的的消息
+  connection.on('message',  (message) => {
+    console.log('message========>', message)
+    if (message.type === 'utf8') {
+        console.log('Received Message: ' + message.utf8Data);
+        // connection.sendUTF(message.utf8Data);
+    } else if (message.type === 'binary') {
+        // binary 二进制
+        console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+        // connection.sendBytes(message.binaryData);
+    }
+  });
 
   // 监听当前连接 当断开链接(网页关闭) 触发
   connection.on('close', (reasonCdoe, description) => {
