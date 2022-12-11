@@ -25,14 +25,13 @@ class MyWebSocket extends WebSocket {
     this.onerror = this.errorHandler // 连接发生错误的回调方法
     this.heartBeatConfig = heartBeatConfig // 心跳连接配置参数
     this.isReconnect = isReconnect // 记录是否断线重连
-    this.reconnectTimer = null // 记录断线重连的时间
+    this.reconnectTimer = null // 记录断线重连的时间器
+    this.startHeartBeatTimer = null // 记录心跳时间器
     this.webSocketState = false // 记录socket连接状态 true为已连接
   }
   // 获取消息
-  getMessage (data) {
-    console.log(data, 'dataddta')
-    // return JSON.parse(data)
-    return data
+  getMessage ({ data }) {
+    return JSON.parse(data)
   }
   // 发送消息
   sendMessage (data) {
@@ -71,7 +70,9 @@ class MyWebSocket extends WebSocket {
     eventBus.emit('changeBtnState', 'close')
     // 设置socket状态为断线
     this.webSocketState = false
-    // 重新连接
+    // 在断开连接时 记得要清楚心跳时间器和 断开重连时间器材
+    this.startHeartBeatTimer && clearTimeout(this.startHeartBeatTimer)
+    this.reconnectTimer && clearTimeout(this.reconnectTimer)
     this.reconnectWebSocket()
   }
   errorHandler () {
@@ -86,18 +87,17 @@ class MyWebSocket extends WebSocket {
 
   // 心跳初始化方法 time：心跳间隔
   startHeartBeat (time) {
-    setTimeout(() => {
+    this.startHeartBeatTimer = setTimeout(() => {
       // 客户端每隔一段时间向服务端发送一个心跳消息
       this.sendMessage({
         ModeCode: ModeCodeEnum.HEART_BEAT,
         msg: Date.now()
       })
+      this.waitingServer()
     }, time);
   }
   //在客户端发送消息之后，延时等待服务器响应,通过webSocketState判断是否连线成功
   waitingServer () {
-    // socket状态设置为断开
-    this.webSocketState = false
     setTimeout(() => {
       if(this.webSocketState) {
         this.startHeartBeat(this.heartBeatConfig.time)

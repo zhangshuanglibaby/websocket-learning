@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-12-11 18:07:16
  * @LastEditors: zhangshuangli
- * @LastEditTime: 2022-12-11 23:11:27
+ * @LastEditTime: 2022-12-12 00:04:25
  * @Description: 这是****文件
  */
 /* 服务器 */
@@ -33,12 +33,12 @@ function messageHandler(data) {
     case 'message':
       console.log('收到消息')
       // 需要发送信息给客户端以此说明连接成功
-      this.send(data)
+      this.send(JSON.stringify(JSON.parse(data)))
       break;
     case 'heart_beat':
       console.log('心跳检测')
       // 需要发送信息给客户端以此说明连接成功
-      this.send(data)
+      this.send(JSON.stringify(JSON.parse(data)))
       break;
   }
 }

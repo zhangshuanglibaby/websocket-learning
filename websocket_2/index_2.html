@@ -1,7 +1,7 @@
 <!--
  * @Date: 2022-12-11 22:01:00
  * @LastEditors: zhangshuangli
- * @LastEditTime: 2022-12-11 22:57:11
+ * @LastEditTime: 2022-12-12 00:11:17
  * @Description: 这是****文件
 -->
 <!DOCTYPE html>
@@ -45,15 +45,15 @@
     }
   }
 
-  // 连接websocket处理函数 isReconnect: 表示是断线重连 or 是主动断线就不重连了
-  const connectWeboSocket = (isReconnect) => {
+  // 连接websocket处理函数
+  const connectWeboSocket = () => {
     myWS = new MyWebsocket(wsUrl)
     // 调用实例对象的init函数 
     myWS.init({
-      time: 30 * 1000,
-      timeout: 3 * 1000,
-      reconnect: 10 * 1000
-    }, isReconnect)
+      time: 4 * 1000,
+      timeout: 2 * 1000,
+      reconnect: 3 * 1000
+    }, true)
   }
 
   // 重新连接webscoket处理 函数
