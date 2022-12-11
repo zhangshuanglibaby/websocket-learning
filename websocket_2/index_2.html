@@ -1,0 +1,94 @@
+<!--
+ * @Date: 2022-12-11 22:01:00
+ * @LastEditors: zhangshuangli
+ * @LastEditTime: 2022-12-11 22:57:11
+ * @Description: 这是****文件
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <button id="connect">连接</button>
+    <button disabled id="sendMessage">发送</button>
+    <button disabled id="close">关闭</button>
+  </div>
+</body>
+</html>
+<script type="module">
+  import eventBus from './eventBus.js'
+  import MyWebsocket from './myWebSocket.js'
+
+  const connectBtn = document.getElementById('connect')
+  const sendMessageBtn = document.getElementById('sendMessage')
+  const closeBtn = document.getElementById('close')
+  const wsUrl = 'ws://127.0.0.1:8002'
+  let myWS = null //  // 用来记录是否连接了websocket
+
+  // 处理下按钮的状态，连接情况下才能有发送和关闭功能，关闭情况下只能有连接功能
+  const setButtonState = (state) => {
+    switch(state) {
+      case 'open':
+        connectBtn.disabled = true
+        sendMessageBtn.disabled =false
+        closeBtn.disabled = false
+        break
+      case 'close':
+        connectBtn.disabled = false
+        sendMessageBtn.disabled = true
+        closeBtn.disabled = true
+    }
+  }
+
+  // 连接websocket处理函数 isReconnect: 表示是断线重连 or 是主动断线就不重连了
+  const connectWeboSocket = (isReconnect) => {
+    myWS = new MyWebsocket(wsUrl)
+    // 调用实例对象的init函数 
+    myWS.init({
+      time: 30 * 1000,
+      timeout: 3 * 1000,
+      reconnect: 10 * 1000
+    }, isReconnect)
+  }
+
+  // 重新连接webscoket处理 函数
+  const reconnectWebSocket = () => {
+    // 判断是否有初始化websocket
+    if(!myWS) {
+      connectWeboSocket()
+      return
+    }
+    // 判断实例上的reconnectTimer 是否有值,要记得清除后再连接
+    if(myWS && myWS.reconnectTimer) {
+      clearTimeout(myWS.reconnectTimer)
+      myWS.reconnectTimer = null
+      connectWeboSocket()
+    }
+  }
+
+
+  // 注册设置按钮样式
+  eventBus.on('changeBtnState', setButtonState)
+  // 注册重连websocket 事件
+  eventBus.on('reconnect', reconnectWebSocket)
+
+  // 点击连接按钮 连接websocket服务器
+  connectBtn.addEventListener('click', reconnectWebSocket)
+  // 点击发送按钮 向服务端传送数据
+  sendMessageBtn.addEventListener('click', e => {
+    myWS.sendMessage({
+      ModeCode: "message",
+      msg: 'hello world'
+    })
+  })
+  // 点击关闭按钮 断开连接
+  closeBtn.addEventListener('click', e => {
+    myWS.close()
+    myWS = null
+  })
+</script>

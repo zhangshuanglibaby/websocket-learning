@@ -1,0 +1,97 @@
+<!--
+ * @Date: 2022-12-11 18:20:16
+ * @LastEditors: zhangshuangli
+ * @LastEditTime: 2022-12-11 22:44:37
+ * @Description: 这是****文件
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <button id="connect">连接</button>
+    <button disabled id="sendMessage">发送</button>
+    <button disabled id="close">关闭</button>
+  </div>
+</body>
+</html>
+<script>
+  const connectBtn = document.getElementById('connect')
+  const sendMessageBtn = document.getElementById('sendMessage')
+  const closeBtn = document.getElementById('close')
+  const wsUrl = 'ws://127.0.0.1:8002'
+  // const ws = new WebSocket(wsUrl)
+  let ws = null // 用来记录是否连接了websocket
+
+  const connetWebSocket = () => {
+    // 如果没有初始化过websocket执行
+    if(!ws) {
+      ws = new WebSocket(wsUrl)
+      // 初始化webscocekt
+      initWebsocket()
+    }
+  }
+  const initWebsocket = () => {
+    // 连接成功后的回调函数
+    ws.onopen = (res) => {
+      setButtonState('open')
+      console.log('onopen 连接成功==========>', res)
+    }
+    // 收到服务器数据后的回调函数
+    ws.onmessage = ({ data }) => {
+      console.log('onmessage 有新消息啦=======>', JSON.parse(data))
+    }
+    // 连接关闭后的回调 函数
+    // 当关闭了服务器后 会走到此回调函数
+    ws.onclose = () => {
+      setButtonState('close')
+      console.log('onclose websocket连接关闭=======>')
+    }
+    // 连接发生错误的回调方法
+    // 如当服务器没有启动 就会走到这个错误回调
+    ws.onerror = (error) => {
+      setButtonState('close')
+      console.log('onerror 发生错误==========>', error)
+    }
+  }
+
+  // 点击连接按钮 连接websocket服务器
+  connectBtn.addEventListener('click', connetWebSocket)
+
+  // 点击发送按钮 
+  sendMessageBtn.addEventListener('click', e => {
+    // 发送消息给服务端
+    ws.send(JSON.stringify({
+      ModeCode: 'message',
+      msg: '客户端连接成功'
+    }))
+  })
+
+  // 点击关闭按钮
+  closeBtn.addEventListener('click', e => {
+    // 关闭当前连接
+    ws.close()
+    // 记得把ws设置为null 才能进行下一次的连接
+    ws = null
+  })
+
+  // 处理下按钮的状态，连接情况下才能有发送和关闭功能，关闭情况下只能有连接功能
+  const setButtonState = (state) => {
+    switch(state) {
+      case 'open':
+        connectBtn.disabled = true
+        sendMessageBtn.disabled =false
+        closeBtn.disabled = false
+        break
+      case 'close':
+        connectBtn.disabled = false
+        sendMessageBtn.disabled = true
+        closeBtn.disabled = true
+    }
+  }
+</script>
